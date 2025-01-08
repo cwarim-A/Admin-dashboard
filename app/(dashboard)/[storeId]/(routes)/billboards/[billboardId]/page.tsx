@@ -2,7 +2,7 @@ import prismadb from "@/lib/prismadb"
 import { BillboardForm } from "./components/billboard-form"
 
 
-type BillboardPageProps = {
+interface BillboardPageProps = {
   params: { billboardId: string };
 };
 
