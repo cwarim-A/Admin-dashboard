@@ -35,10 +35,10 @@ interface BillboardPageProps {
 }
 
 const BillboardPage = async ({ params }: BillboardPageProps) => {
-  console.log(params)
+   const {billboardId} = await params;
   const billboard = await prismadb.billboard.findUnique({
     where: {
-      id: params.billboardId,
+      id: billboardId,
     },
   });
 
