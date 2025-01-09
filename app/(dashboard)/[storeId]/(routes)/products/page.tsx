@@ -7,9 +7,10 @@ import { format } from "date-fns";
 
 
 const ProductsPage = async({params}:{params:{storeId:string}}) => {
+    const {storeId} = await params
   const products = await prismadb.product.findMany({
         where:{
-          storeId:params.storeId
+          storeId:storeId
         },
         include:{
             category:true,

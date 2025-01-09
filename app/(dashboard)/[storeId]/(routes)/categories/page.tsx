@@ -6,9 +6,11 @@ import { format } from "date-fns";
 
 
 const CategoriesPage = async({params}:{params:{storeId:string}}) => {
+
+    const {storeId} = await params
   const categories = await prismadb.category.findMany({
         where:{
-          storeId:params.storeId
+          storeId:storeId
         },
         include:{
           billboard:true
