@@ -31,7 +31,7 @@ import prismadb from "@/lib/prismadb";
 import { BillboardForm } from "./components/billboard-form";
 
 interface BillboardPageProps {
-  params: { billboardId: string };
+  params: Promise<{ billboardId: string }>;
 }
 
 const BillboardPage = async ({ params }: BillboardPageProps) => {
