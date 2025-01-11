@@ -34,7 +34,7 @@ interface BillboardPageProps {
   params: Promise<{ billboardId: string }>;
 }
 
-const BillboardPage = async ({ params }: BillboardPageProps) => {
+const BillboardPage:React.FC<BillboardPageProps> = async ({ params } ) => {
    const {billboardId} = await params;
   const billboard = await prismadb.billboard.findUnique({
     where: {
