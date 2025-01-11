@@ -4,8 +4,11 @@ import {SizeColumn} from "./components/columns"
 import prismadb from "@/lib/prismadb"
 import { format } from "date-fns";
 
+interface SizesPageProps{
+  params:Promise<{ storeId: string }>;
+}
 
-const SizesPage = async({params}:{params:{storeId:string}}) => {
+const SizesPage = async({params}:SizesPageProps) => {
 
   const {storeId} = await params;
   const sizes = await prismadb.size.findMany({

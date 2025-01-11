@@ -2,18 +2,24 @@ import prismadb from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+
+interface RouteContext {
+  params:Promise<{productId:string,storeId:string}>
+}
+
 export async function GET(
   req: Request,
-  { params }: { params: { productId: string } }
+  context: RouteContext
 ) {
   try {
-    if (!params.productId) {
+    const {productId} = await context.params;
+    if (!productId) {
       return new NextResponse("Product Id is required", { status: 400 });
     }
 
     const product = await prismadb.product.findUnique({
       where: {
-        id: params.productId,
+        id: productId,
       },
       include: {
         category: true,
@@ -31,10 +37,11 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string; productId: string } }
+  context:RouteContext
 ) {
   try {
     const { userId } = await auth();
+    const {productId,storeId} = await context.params;
     const body = await req.json();
     const {
       name,
@@ -68,13 +75,13 @@ export async function PATCH(
     if (!images) {
        return new NextResponse("images is required", { status: 400 });
     }
-    if (!params.productId) {
+    if (!productId) {
       return new NextResponse("Product Id is required", { status: 400 });
     }
 
     const storeByUser = await prismadb.store.findFirst({
       where: {
-        id: params.storeId,
+        id: storeId,
         userId,
       },
     });
@@ -84,7 +91,7 @@ export async function PATCH(
 
      await prismadb.product.update({
       where: {
-        id: params.productId,
+        id: productId,
       },
       data: {
         name,
@@ -102,7 +109,7 @@ export async function PATCH(
 
     const product = await prismadb.product.update({
       where:{
-        id:params.productId
+        id:productId
       },
       data:{
         images:{
@@ -128,25 +135,25 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { storeId: string; productId: string } }
+  context:RouteContext
 ) {
   try {
     const { userId } = await auth();
-
+    const {productId,storeId} = await context.params;
     // Check authentication
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 });
     }
 
     // Validate required parameters
-    if (!params.productId) {
+    if (!productId) {
       return new NextResponse("Product ID is required", { status: 400 });
     }
 
     // Check if the store belongs to the user
     const storeByUser = await prismadb.store.findFirst({
       where: {
-        id: params.storeId,
+        id: storeId,
         userId,
       },
     });
@@ -157,7 +164,7 @@ export async function DELETE(
 
     const product = await prismadb.product.findUnique({
       where: {
-        id: params.productId,
+        id: productId,
       },
     });
 
@@ -169,7 +176,7 @@ export async function DELETE(
    
       const deletedProduct = await prismadb.product.delete({
         where: {
-          id: params.productId,
+          id: productId,
         },
       });
 

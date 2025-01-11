@@ -5,8 +5,12 @@ import {OrderColumn} from "./components/columns"
 import prismadb from "@/lib/prismadb"
 import { format } from "date-fns";
 
+interface OrdersPageProps{
+  params:Promise<{ storeId: string }>;
+}
 
-const OrdersPage = async({params}:{params:{storeId:string}}) => {
+
+const OrdersPage = async({params}:OrdersPageProps) => {
   const {storeId} = await params;
   const orders = await prismadb.order.findMany({
         where:{

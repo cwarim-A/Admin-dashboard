@@ -2,10 +2,15 @@ import prismadb from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+interface RouteContext{
+    params:Promise<{storeId:string}>
+}
+
 export async function PATCH (req:Request, 
-    {params}:{params:{storeId:string}}
+    context:RouteContext
 ){
     try {
+        const {storeId} = await context.params;
         const {userId} = await auth();
         const body = await req.json();
         const { name } = body;
@@ -15,13 +20,13 @@ export async function PATCH (req:Request,
         if(!name){
             return new NextResponse("Name is required", {status:400})
         }
-        if(!params.storeId){
+        if(!storeId){
             return new NextResponse("storeId is required", {status:400})
         }
 
         const store = await prismadb.store.updateMany({
             where:{
-                id:params.storeId,
+                id:storeId,
                 userId
             },
             data:{
@@ -40,22 +45,23 @@ export async function PATCH (req:Request,
 
 
 export async function DELETE (req:Request, 
-    {params}:{params:{storeId:string}}
+    context:RouteContext
 ){
     try {
+        const {storeId} = await context.params;
         const {userId} = await auth();
         
         if(!userId){
             return new NextResponse("Unauthenticated",{status:401} )
         }
         
-        if(!params.storeId){
+        if(!storeId){
             return new NextResponse("storeId is required", {status:400})
         }
 
         const store = await prismadb.store.deleteMany({
             where:{
-                id:params.storeId,
+                id:storeId,
                 userId
             }
         }) 

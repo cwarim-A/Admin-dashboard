@@ -13,7 +13,7 @@ import { CategoryColumn, columns } from "./columns"
 import { DataTable } from "@/components/ui/data-table"
 
 interface CategoryClientProps{
-    data:BillboardColumn[]
+    data:CategoryColumn[]
 }
 
 

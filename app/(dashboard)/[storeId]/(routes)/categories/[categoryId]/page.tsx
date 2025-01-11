@@ -2,7 +2,12 @@ import prismadb from "@/lib/prismadb"
 import { CategoryForm } from "./components/category-form"
 
 
-const CategoryPage = async ({params}:{params:{categoryId:string,storeId:string}}) => {
+interface CategoryPageProps{
+  params:Promise<{ storeId: string,categoryId:string }>;
+}
+
+
+const CategoryPage = async ({params}:CategoryPageProps) => {
 
     const {categoryId,storeId} = await params;
 

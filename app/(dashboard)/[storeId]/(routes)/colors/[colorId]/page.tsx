@@ -2,7 +2,13 @@ import prismadb from "@/lib/prismadb"
 import { ColorForm } from "./components/color-form"
 
 
-const ColorPage = async ({params}:{params:{colorId:string}}) => {
+interface ColorPageProps{
+  params:Promise<{ colorId: string }>;
+}
+
+
+
+const ColorPage = async ({params}:ColorPageProps) => {
 
     const {colorId} = await params;
 

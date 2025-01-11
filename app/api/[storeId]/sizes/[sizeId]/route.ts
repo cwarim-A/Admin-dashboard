@@ -2,18 +2,24 @@ import prismadb from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+interface RouteContext{
+  params:Promise<{sizeId:string,storeId:string}>
+}
+
+
 export async function GET(
   req: Request,
-  { params }: { params: { sizeId: string } }
+  context:RouteContext
 ) {
+  const {sizeId} = await context.params;
   try {
-    if (!params.sizeId) {
+    if (!sizeId) {
       return new NextResponse("Size Id is required", { status: 400 });
     }
 
     const size = await prismadb.size.findUnique({
       where: {
-        id: params.sizeId,
+        id: sizeId,
       },
     });
     return NextResponse.json(size);
@@ -25,8 +31,9 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string; sizeId: string } }
+  context:RouteContext
 ) {
+  const {sizeId,storeId} = await context.params;
   try {
     const { userId } = await auth();
     const body = await req.json();
@@ -40,13 +47,13 @@ export async function PATCH(
     if (!value) {
       return new NextResponse("Value is required", { status: 400 });
     }
-    if (!params.sizeId) {
+    if (!sizeId) {
       return new NextResponse("Size Id is required", { status: 400 });
     }
 
     const storeByUser = await prismadb.store.findFirst({
       where: {
-        id: params.storeId,
+        id: storeId,
         userId,
       },
     });
@@ -56,7 +63,7 @@ export async function PATCH(
 
     const size = await prismadb.size.update({
       where: {
-        id: params.sizeId,
+        id: sizeId,
       },
       data: {
         name,
@@ -72,8 +79,9 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { storeId: string; sizeId: string } }
+  context: RouteContext
 ) {
+  const {sizeId,storeId} = await context.params;
   try {
     const { userId } = await auth();
 
@@ -83,14 +91,14 @@ export async function DELETE(
     }
 
     // Validate required parameters
-    if (!params.sizeId) {
+    if (!sizeId) {
       return new NextResponse("Size ID is required", { status: 400 });
     }
 
     // Check if the store belongs to the user
     const storeByUser = await prismadb.store.findFirst({
       where: {
-        id: params.storeId,
+        id: storeId,
         userId,
       },
     });
@@ -101,7 +109,7 @@ export async function DELETE(
 
     const size = await prismadb.size.findUnique({
       where: {
-        id: params.sizeId,
+        id: sizeId,
       },
     });
 
@@ -113,7 +121,7 @@ export async function DELETE(
     try {
       const deletedSize = await prismadb.size.delete({
         where: {
-          id: params.sizeId,
+          id: sizeId,
         },
       });
 
@@ -132,7 +140,7 @@ export async function DELETE(
       return new NextResponse("Error deleting the billboard", { status: 500 });
     }
   } catch (error) {
-    console.error("[BILLBOARD_DELETE]", error);
+    console.error("[SIZE_DELETE]", error);
     return new NextResponse("Internal server error", { status: 500 });
   }
 }

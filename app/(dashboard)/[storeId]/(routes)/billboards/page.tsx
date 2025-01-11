@@ -5,7 +5,12 @@ import prismadb from "@/lib/prismadb"
 import { format } from "date-fns";
 
 
-const BillboardsPage = async({params}:{params:{storeId:string}}) => {
+interface BillboardPageProps{
+  params: Promise<{ storeId: string }>;
+}
+
+
+const BillboardsPage = async({params}:BillboardPageProps) => {
 
     const {storeId} = await params;
 

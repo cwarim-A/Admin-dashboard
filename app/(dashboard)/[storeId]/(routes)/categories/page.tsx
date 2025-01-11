@@ -5,9 +5,14 @@ import prismadb from "@/lib/prismadb"
 import { format } from "date-fns";
 
 
-const CategoriesPage = async({params}:{params:{storeId:string}}) => {
+interface CategoryPageProps{
+  params:Promise<{ storeId: string }>;
+}
 
-    const {storeId} = await params
+
+const CategoriesPage = async({params}:CategoryPageProps) => {
+
+    const {storeId} = await params;
   const categories = await prismadb.category.findMany({
         where:{
           storeId:storeId
