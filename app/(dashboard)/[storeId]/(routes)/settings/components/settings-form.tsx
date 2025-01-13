@@ -35,6 +35,8 @@ const formSchema = z.object({
 
 type SettingsFormValues = z.infer<typeof formSchema>;
 
+const baseURL = "https://admin-dashboard-sass.vercel.app";
+
 export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
@@ -50,7 +52,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const onSubmit = async (data: SettingsFormValues) => {
     try {
       setLoading(true);
-      const response = await axios.patch(`/api/stores/${params.storeId}`, data);
+      const response = await axios.patch(`${baseURL}/api/stores/${params.storeId}`, data);
       router.refresh();
       toast.success("store updated.");
     } catch (error) {
@@ -63,7 +65,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/stores/${params.storeId}`);
+      await axios.delete(`${baseURL}/api/stores/${params.storeId}`);
       router.refresh();
       router.push("/");
       toast.success("Store deleted.");

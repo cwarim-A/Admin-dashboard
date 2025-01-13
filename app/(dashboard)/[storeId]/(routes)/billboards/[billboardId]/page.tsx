@@ -46,9 +46,9 @@ const BillboardPage = async ({ params }:{
     },
   });
 
-  if (!billboard) {
-    return <div>Billboard not found</div>;
-  }
+  // if (!billboard) {
+  //   return <div>Billboard not found</div>;
+  // }
 
   return (
     <div className="flex-col">

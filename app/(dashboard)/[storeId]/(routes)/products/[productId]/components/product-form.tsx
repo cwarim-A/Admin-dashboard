@@ -53,6 +53,8 @@ const formSchema = z.object({
 
 type ProductFormValues = z.infer<typeof formSchema>;
 
+const baseURL = "https://admin-dashboard-sass.vercel.app";
+
 export const ProductForm: React.FC<ProductFormProps> = ({ 
   initialData,
   categories,
@@ -95,9 +97,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
       if(initialData){
         console.log(data)
-         await axios.patch(`/api/${params.storeId}/products/${params.productId}`, data);
+         await axios.patch(`${baseURL}/api/${params.storeId}/products/${params.productId}`, data);
       }else{
-        await axios.post(`/api/${params.storeId}/products`, data);
+        await axios.post(`${baseURL}/api/${params.storeId}/products`, data);
       }
       
       router.refresh();
@@ -114,7 +116,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
+      await axios.delete(`${baseURL}/api/${params.storeId}/products/${params.productId}`);
       router.refresh();
       router.push(`/${params.storeId}/products`);
       toast.success("Product deleted.");
