@@ -3,16 +3,19 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 
-interface RouteContext {
-  params:Promise<{productId:string,storeId:string}>
-}
+const addCorsHeaders = (res:Response) => {
+  res.headers.set("Access-Control-Allow-Origin", "*");
+  res.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  return res;
+};
 
 export async function GET(
   req: Request,
-  context: RouteContext
+  {params}:{params:Promise<{productId:string}>}
 ) {
   try {
-    const {productId} = await context.params;
+    const {productId} = await params;
     if (!productId) {
       return new NextResponse("Product Id is required", { status: 400 });
     }
@@ -28,20 +31,20 @@ export async function GET(
         images: true,
       },
     });
-    return NextResponse.json(product);
+    return addCorsHeaders(NextResponse.json(product));
   } catch (error) {
     console.log("[PRODUCT_GET]", error);
-    return new NextResponse("Internal error", { status: 500 });
+    return addCorsHeaders(new NextResponse("Internal error", { status: 500 }));
   }
 }
 
 export async function PATCH(
   req: Request,
-  context:RouteContext
+  {params}:{params:Promise<{storeId:string; productId:string}>}
 ) {
   try {
     const { userId } = await auth();
-    const {productId,storeId} = await context.params;
+    const {productId,storeId} = await params;
     const body = await req.json();
     const {
       name,
@@ -55,28 +58,28 @@ export async function PATCH(
     } = body;
     
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 401 });
+      return addCorsHeaders(new NextResponse("Unauthenticated", { status: 401 }));
     }
     if (!name) {
-      return new NextResponse("Name is required", { status: 400 });
+      return addCorsHeaders(new NextResponse("Name is required", { status: 400 }));
     }
     if (!price) {
-      return new NextResponse(" price is required", { status: 400 });
+      return addCorsHeaders(new NextResponse(" price is required", { status: 400 }));
     }
     if (!categoryId) {
-      return new NextResponse("categoryId is required", { status: 400 });
+      return addCorsHeaders(new NextResponse("categoryId is required", { status: 400 }));
     }
     if (!colorId) {
-      return new NextResponse("colorId is required", { status: 400 });
+      return addCorsHeaders(new NextResponse("colorId is required", { status: 400 }));
     }
     if (!sizeId) {
-      return new NextResponse("sizeId is required", { status: 400 });
+      return addCorsHeaders(new NextResponse("sizeId is required", { status: 400 }));
     }
     if (!images) {
-       return new NextResponse("images is required", { status: 400 });
+       return addCorsHeaders(new NextResponse("images is required", { status: 400 }));
     }
     if (!productId) {
-      return new NextResponse("Product Id is required", { status: 400 });
+      return addCorsHeaders(new NextResponse("Product Id is required", { status: 400 }));
     }
 
     const storeByUser = await prismadb.store.findFirst({
@@ -86,7 +89,7 @@ export async function PATCH(
       },
     });
     if (!storeByUser) {
-      return new NextResponse("Unauthorized", { status: 403 });
+      return addCorsHeaders(new NextResponse("Unauthorized", { status: 403 }));
     }
 
      await prismadb.product.update({
@@ -126,28 +129,28 @@ export async function PATCH(
     
 
 
-    return NextResponse.json(product);
+    return addCorsHeaders(NextResponse.json(product));
   } catch (error) {
     console.log("[PRODUCT_PATCH]", error);
-    return new NextResponse("Internal error", { status: 500 });
+    return addCorsHeaders(new NextResponse("Internal error", { status: 500 }));
   }
 }
 
 export async function DELETE(
   req: Request,
-  context:RouteContext
+  {params}:{params:Promise<{storeId:string; productId:string}>}
 ) {
   try {
     const { userId } = await auth();
-    const {productId,storeId} = await context.params;
+    const {productId,storeId} = await params;
     // Check authentication
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 401 });
+      return addCorsHeaders(new NextResponse("Unauthenticated", { status: 401 }));
     }
 
     // Validate required parameters
     if (!productId) {
-      return new NextResponse("Product ID is required", { status: 400 });
+      return addCorsHeaders(new NextResponse("Product ID is required", { status: 400 }));
     }
 
     // Check if the store belongs to the user
@@ -159,7 +162,7 @@ export async function DELETE(
     });
 
     if (!storeByUser) {
-      return new NextResponse("Unauthorized", { status: 403 });
+      return addCorsHeaders(new NextResponse("Unauthorized", { status: 403 }));
     }
 
     const product = await prismadb.product.findUnique({
@@ -169,7 +172,7 @@ export async function DELETE(
     });
 
     if (!product) {
-      return new NextResponse("product not found", { status: 404 });
+      return addCorsHeaders(new NextResponse("product not found", { status: 404 }));
     }
 
     // Attempt to delete the billboard
@@ -180,7 +183,7 @@ export async function DELETE(
         },
       });
 
-      return NextResponse.json(deletedProduct);
+      return addCorsHeaders(NextResponse.json(deletedProduct));
     
       
 
@@ -188,6 +191,6 @@ export async function DELETE(
     
   } catch (error) {
     console.error("[PRODUCT_DELETE]", error);
-    return new NextResponse("Internal server error", { status: 500 });
+    return addCorsHeaders(new NextResponse("Internal server error", { status: 500 }));
   }
 }

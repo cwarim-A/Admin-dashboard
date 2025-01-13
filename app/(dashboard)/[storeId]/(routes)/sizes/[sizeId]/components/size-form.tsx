@@ -37,7 +37,7 @@ const formSchema = z.object({
 
 type SizeFormValues = z.infer<typeof formSchema>;
 
-const baseURL = "https://admin-dashboard-sass.vercel.app";
+
 
 export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
   const params = useParams();
@@ -63,9 +63,9 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
     try {
       setLoading(true);
       if(initialData){
-         await axios.patch(`${baseURL}/api/${params.storeId}/sizes/${params.sizeId}`, data);
+         await axios.patch(`/api/${params.storeId}/sizes/${params.sizeId}`, data);
       }else{
-        await axios.post(`${baseURL}/api/${params.storeId}/sizes`, data);
+        await axios.post(`/api/${params.storeId}/sizes`, data);
       }
       
       router.refresh();

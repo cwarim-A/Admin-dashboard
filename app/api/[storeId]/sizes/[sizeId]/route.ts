@@ -2,19 +2,22 @@ import prismadb from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-interface RouteContext{
-  params:Promise<{sizeId:string,storeId:string}>
-}
+const addCorsHeaders = (res:Response) => {
+  res.headers.set("Access-Control-Allow-Origin", "*");
+  res.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  return res;
+};
 
 
 export async function GET(
   req: Request,
-  context:RouteContext
+  {params}:{params:Promise<{sizeId:string}>}
 ) {
-  const {sizeId} = await context.params;
+  const {sizeId} = await params;
   try {
     if (!sizeId) {
-      return new NextResponse("Size Id is required", { status: 400 });
+      return addCorsHeaders(new NextResponse("Size Id is required", { status: 400 }));
     }
 
     const size = await prismadb.size.findUnique({
@@ -22,33 +25,33 @@ export async function GET(
         id: sizeId,
       },
     });
-    return NextResponse.json(size);
+    return addCorsHeaders(NextResponse.json(size));
   } catch (error) {
     console.log("[SIZE_GET]", error);
-    return new NextResponse("Internal error", { status: 500 });
+    return addCorsHeaders(new NextResponse("Internal error", { status: 500 }));
   }
 }
 
 export async function PATCH(
   req: Request,
-  context:RouteContext
+  {params}:{params:Promise<{storeId:string; sizeId:string}>}
 ) {
-  const {sizeId,storeId} = await context.params;
+  const {sizeId,storeId} = await params;
   try {
     const { userId } = await auth();
     const body = await req.json();
     const { name,value } = body;
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 401 });
+      return addCorsHeaders(new NextResponse("Unauthenticated", { status: 401 }));
     }
     if (!name) {
-      return new NextResponse("Name is required", { status: 400 });
+      return addCorsHeaders(new NextResponse("Name is required", { status: 400 }));
     }
     if (!value) {
-      return new NextResponse("Value is required", { status: 400 });
+      return addCorsHeaders(new NextResponse("Value is required", { status: 400 }));
     }
     if (!sizeId) {
-      return new NextResponse("Size Id is required", { status: 400 });
+      return addCorsHeaders(new NextResponse("Size Id is required", { status: 400 }));
     }
 
     const storeByUser = await prismadb.store.findFirst({
@@ -58,7 +61,7 @@ export async function PATCH(
       },
     });
     if (!storeByUser) {
-      return new NextResponse("Unauthorized", { status: 403 });
+      return addCorsHeaders(new NextResponse("Unauthorized", { status: 403 }));
     }
 
     const size = await prismadb.size.update({
@@ -70,29 +73,29 @@ export async function PATCH(
         value,
       },
     });
-    return NextResponse.json(size);
+    return addCorsHeaders(NextResponse.json(size));
   } catch (error) {
     console.log("[SIZE_PATCH]", error);
-    return new NextResponse("Internal error", { status: 500 });
+    return addCorsHeaders(new NextResponse("Internal error", { status: 500 }));
   }
 }
 
 export async function DELETE(
   req: Request,
-  context: RouteContext
+  {params}:{params:Promise<{storeId:string; sizeId:string}>}
 ) {
-  const {sizeId,storeId} = await context.params;
+  const {sizeId,storeId} = await params;
   try {
     const { userId } = await auth();
 
     // Check authentication
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 401 });
+      return addCorsHeaders(new NextResponse("Unauthenticated", { status: 401 }));
     }
 
     // Validate required parameters
     if (!sizeId) {
-      return new NextResponse("Size ID is required", { status: 400 });
+      return addCorsHeaders(new NextResponse("Size ID is required", { status: 400 }));
     }
 
     // Check if the store belongs to the user
@@ -104,7 +107,7 @@ export async function DELETE(
     });
 
     if (!storeByUser) {
-      return new NextResponse("Unauthorized", { status: 403 });
+      return addCorsHeaders(new NextResponse("Unauthorized", { status: 403 }));
     }
 
     const size = await prismadb.size.findUnique({
@@ -114,7 +117,7 @@ export async function DELETE(
     });
 
     if (!size) {
-      return new NextResponse("Size not found", { status: 404 });
+      return addCorsHeaders(new NextResponse("Size not found", { status: 404 }));
     }
 
     // Attempt to delete the billboard
@@ -125,23 +128,23 @@ export async function DELETE(
         },
       });
 
-      return NextResponse.json(deletedSize);
+      return addCorsHeaders(NextResponse.json(deletedSize));
     } catch (error: any) {
       // Check for foreign key constraint error
       if (error.code === "P2003") {
-        return new NextResponse(
+        return addCorsHeaders(new NextResponse(
           "Cannot delete the billboard. Make sure all related categories are removed first.",
           { status: 400 }
-        );
+        ));
       }
 
       // Log and return a generic error response
       console.error("[BILLBOARD_DELETE_PRISMA_ERROR]", error);
-      return new NextResponse("Error deleting the billboard", { status: 500 });
+      return addCorsHeaders(new NextResponse("Error deleting the billboard", { status: 500 }));
     }
   } catch (error) {
     console.error("[SIZE_DELETE]", error);
-    return new NextResponse("Internal server error", { status: 500 });
+    return addCorsHeaders(new NextResponse("Internal server error", { status: 500 }));
   }
 }
 

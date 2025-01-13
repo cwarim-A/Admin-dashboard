@@ -36,7 +36,7 @@ const formSchema = z.object({
   billboardId:z.string().min(1),
 });
 
-const baseURL = "https://admin-dashboard-sass.vercel.app";
+
 
 type CategoryFormValues = z.infer<typeof formSchema>;
 
@@ -64,9 +64,9 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData,billboar
     try {
       setLoading(true);
       if(initialData){
-         await axios.patch(`${baseURL}/api/${params.storeId}/categories/${params.categoryId}`, data);
+         await axios.patch(`/api/${params.storeId}/categories/${params.categoryId}`, data);
       }else{
-        await axios.post(`${baseURL}/api/${params.storeId}/categories`, data);
+        await axios.post(`/api/${params.storeId}/categories`, data);
       }
       
       router.refresh();
@@ -82,7 +82,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData,billboar
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`${baseURL}/api/${params.storeId}/categories/${params.categoryId}`);
+      await axios.delete(`/api/${params.storeId}/categories/${params.categoryId}`);
       router.refresh();
       router.push(`/${params.storeId}/categories`);
       toast.success("Category deleted.");

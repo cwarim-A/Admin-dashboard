@@ -39,7 +39,7 @@ const formSchema = z.object({
 
 type SizeFormValues = z.infer<typeof formSchema>;
 
-const baseURL = "https://admin-dashboard-sass.vercel.app";
+
 
 export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
   const params = useParams();
@@ -65,9 +65,9 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
     try {
       setLoading(true);
       if(initialData){
-         await axios.patch(`${baseURL}/api/${params.storeId}/colors/${params.colorId}`, data);
+         await axios.patch(`/api/${params.storeId}/colors/${params.colorId}`, data);
       }else{
-        await axios.post(`${baseURL}/api/${params.storeId}/colors`, data);
+        await axios.post(`/api/${params.storeId}/colors`, data);
       }
       
       router.refresh();
@@ -83,7 +83,7 @@ export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`${baseURL}/api/${params.storeId}/colors/${params.colorId}`);
+      await axios.delete(`/api/${params.storeId}/colors/${params.colorId}`);
       router.refresh();
       router.push(`/${params.storeId}/colors`);
       toast.success("Color deleted.");
